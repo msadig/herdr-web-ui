@@ -15,11 +15,11 @@ command = ["powershell", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "B
 platforms = ["windows"]
 
 [[build]]
-command = ["sh", "scripts/with-bun.sh", "install"]
+command = ["sh", "scripts/with-bun.sh", "install", "--frozen-lockfile"]
 platforms = ["linux", "macos"]
 
 [[build]]
-command = ["bun", "install"]
+command = ["bun", "install", "--frozen-lockfile"]
 platforms = ["windows"]
 
 [[build]]
