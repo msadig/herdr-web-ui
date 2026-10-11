@@ -40,7 +40,11 @@ export function sameOrigin(request: Request): boolean {
     const expected = new URL(request.url);
     // Reverse proxies commonly terminate HTTPS; do not trust arbitrary forwarded hosts.
     if (request.headers.get("x-forwarded-proto") === "https") expected.protocol = "https:";
-    return new URL(origin).origin === expected.origin;
+    const given = new URL(origin);
+    if (given.origin === expected.origin) return true;
+    // A TLS-terminating proxy that leaves X-Forwarded-Proto off websocket upgrades (Coder's app
+    // proxy does): the browser's own https Origin naming this very Host is still this site.
+    return given.protocol === "https:" && expected.protocol === "http:" && given.host === expected.host;
   } catch { return false; }
 }
 export function canSendSecret(request: Request): boolean {

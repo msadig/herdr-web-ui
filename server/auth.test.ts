@@ -135,6 +135,11 @@ describe("isSecureRequest", () => {
 describe("sameOrigin", () => {
   it("trusts a stated same-origin and refuses a stated cross-site one", () => {
     expect(sameOrigin(new Request("http://host/api/pane/close", { headers: { origin: "http://host" } }))).toBe(true);
+    // a TLS proxy that drops X-Forwarded-Proto (Coder's websocket upgrades): same host over https passes, nothing else
+    expect(sameOrigin(new Request("http://host/ws", { headers: { origin: "https://host" } }))).toBe(true);
+    expect(sameOrigin(new Request("http://host/ws", { headers: { origin: "https://evil.invalid" } }))).toBe(false);
+    expect(sameOrigin(new Request("http://host/ws", { headers: { origin: "https://host:8443" } }))).toBe(false);
+    expect(sameOrigin(new Request("https://host/ws", { headers: { origin: "http://host" } }))).toBe(false);
     expect(sameOrigin(new Request("http://host/api/pane/close", { headers: { origin: "https://evil.invalid", "x-herdr-machine": "1" } }))).toBe(false);
     expect(sameOrigin(new Request("http://host/api/pane/close", { headers: { "sec-fetch-site": "cross-site", "x-herdr-machine": "1" } }))).toBe(false);
   });
